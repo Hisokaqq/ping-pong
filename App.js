@@ -13,8 +13,6 @@ import Animated, {
   useSharedValue,
   withTiming,
   useAnimatedGestureHandler,
-  withSequence,
-  BounceIn,
 } from "react-native-reanimated";
 import {
   PanGestureHandler,
@@ -43,7 +41,6 @@ export default function Game() {
     h: 37,
   };
 
-  const [score, setScore] = useState(0);
   const [gameOver, setGameOver] = useState(true);
 
   const targetPositionX = useSharedValue(width / 2);
@@ -94,7 +91,6 @@ export default function Game() {
       } else {
         newDirection = { x: direction.value.x, y: -direction.value.y };
       }
-      setScore((s) => s + 1);
     }
 
     // Player Hit detection
@@ -137,7 +133,6 @@ export default function Game() {
   const restartGame = () => {
     targetPositionX.value = width / 2;
     targetPositionY.value = height / 2;
-    setScore(0);
     setGameOver(false);
   };
 
@@ -148,20 +143,7 @@ export default function Game() {
     };
   });
 
-  const islandAnimatedStyles = useAnimatedStyle(
-    () => ({
-      width: withSequence(
-        withTiming(islandDimensions.w * 1.3),
-        withTiming(islandDimensions.w)
-      ),
-      height: withSequence(
-        withTiming(islandDimensions.h * 1.3),
-        withTiming(islandDimensions.h)
-      ),
-      opacity: withSequence(withTiming(0), withTiming(1)),
-    }),
-    [score]
-  );
+ 
 
   const playerAnimatedStyles = useAnimatedStyle(() => ({
     left: playerPos.value.x,
@@ -178,7 +160,6 @@ export default function Game() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.score}>{score}</Text>
       {gameOver && (
         <View style={styles.gameOverContainer}>
           <Text style={styles.gameOver}>Game over</Text>
@@ -189,20 +170,7 @@ export default function Game() {
       {!gameOver && <Animated.View style={[styles.ball, ballAnimatedStyles]} />}
 
       {/* Island */}
-      <Animated.View
-        entering={BounceIn}
-        key={score}
-        style={{
-          position: "absolute",
-          top: islandDimensions.y,
-          left: islandDimensions.x,
-          width: islandDimensions.w,
-          height: islandDimensions.h,
-          borderRadius: 20,
-          backgroundColor: "black",
-        }}
-      />
-
+      
       {/* Player */}
       <Animated.View
         style={[
@@ -246,13 +214,7 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     position: "absolute",
   },
-  score: {
-    fontSize: 150,
-    fontWeight: "500",
-    position: "absolute",
-    top: 150,
-    color: "lightgray",
-  },
+
   gameOverContainer: {
     position: "absolute",
     top: 350,
